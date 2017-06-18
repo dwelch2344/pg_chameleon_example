@@ -1,0 +1,38 @@
+version: '3'
+services:
+  sync:
+    build: .
+    networks:
+      - demo
+    volumes:
+      - ./example:/root/.pg_chameleon
+    depends_on:
+      - insource
+      - outsource
+    links:
+      - insource
+      - outsource
+  insource:
+    build: example/MySqlDocker/
+    # image: "mysql:latest"
+    networks:
+      - demo
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=demo
+      - MYSQL_USER=demo
+      - MYSQL_PASSWORD=password
+  outsource:
+    image: mdillon/postgis:9.6
+    networks:
+      - demo
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=replicated_mysql
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+networks:
+  demo:
